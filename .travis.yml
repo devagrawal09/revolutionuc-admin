@@ -12,7 +12,7 @@ before_script:
   - npm install -g @angular/cli
 
 script:
-  - ng build --prod --aot --base-href="/admin" --deploy-url="/admin"
+  - ng build --prod --aot --baseHref="/admin" --deploy-url="https://revolutionuc.com/admin/"
 
 before_deploy:
 - pip install --user awscli
