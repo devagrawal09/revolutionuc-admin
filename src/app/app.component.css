@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+}
+mat-toolbar {
+  margin-bottom: 1em;
+}
+.container {
+  padding: 0 1rem;
+}
