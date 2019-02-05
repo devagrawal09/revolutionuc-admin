@@ -58,6 +58,7 @@ export class DashboardComponent implements OnInit {
           drawLine(code.location.topRightCorner, code.location.bottomRightCorner, '#FF3B58');
           drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, '#FF3B58');
           drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, '#FF3B58');
+
         } else {
 
         }
