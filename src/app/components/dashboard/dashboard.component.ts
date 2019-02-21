@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
-import { MatBottomSheet } from '@angular/material';
 import { DashboardService } from 'src/app/services/dashboard.service';
 
 import jsQR from 'jsqr';
 import { Point } from 'jsqr/dist/locator';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,16 +15,26 @@ import { Point } from 'jsqr/dist/locator';
 export class DashboardComponent implements OnInit {
   @ViewChild('videoPreview') videoPreview: ElementRef;
   @ViewChild('scanningCanvas') scanningCanvas: ElementRef;
-  constructor(private route: ActivatedRoute, private service: DashboardService ) { }
-  registrants: object[];
+  constructor(private route: ActivatedRoute, private service: DashboardService, private dialog: MatDialog,
+              private snackBar: MatSnackBar ) { }
+  registrants: any;
   ngOnInit() {
-    this.service.getRegistrants()
-                .subscribe((data => this.registrants = data));
+  }
+  onSearchChange(q: string) {
+    if (q.length >= 3) {
+      this.service.getRegistrants(q).subscribe(result => this.registrants = result);
+    }
+  }
+  checkIn(user: any) {
+    this.service.checkInUser(user.id).subscribe(data => user.checkedIn = true);
   }
   startScanning() {
     const video: HTMLVideoElement = this.videoPreview.nativeElement;
     const canvasEl: HTMLCanvasElement = this.scanningCanvas.nativeElement;
     const canvas: CanvasRenderingContext2D = canvasEl.getContext('2d');
+    const service = this.service;
+    const dialog = this.dialog;
+    const sb = this.snackBar;
     navigator.mediaDevices.getUserMedia({audio: false, video: {facingMode: 'environment'}})
              .then((videoStream) => {
                 video.srcObject = videoStream;
@@ -58,12 +68,52 @@ export class DashboardComponent implements OnInit {
           drawLine(code.location.topRightCorner, code.location.bottomRightCorner, '#FF3B58');
           drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, '#FF3B58');
           drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, '#FF3B58');
-
-        } else {
-
+          let dialogRef;
+          service.getRegistrants(undefined, code.data).subscribe((resp) => {
+          if (resp.checkedIn === true) {
+            sb.open(`${resp.firstName} ${resp.lastName} has already been checked-in`, undefined, {
+              duration: 1500
+            });
+            requestAnimationFrame(tick);
+          }
+          else {
+            dialogRef = dialog.open(CheckInDialogComponent, {
+              data: {
+                user: resp
+              }
+            });
+          }
+          dialogRef.afterClosed().subscribe(result => {
+            if (result.id) {
+              service.checkInUser(result.id).subscribe(data => console.log(data) );
+            }
+            requestAnimationFrame(tick);
+          });
+        }, error => {
+          console.log(error);
+          if (error.statusCode) {
+            dialogRef = dialog.open(CheckInDialogComponent, {
+              data: {
+                message: error.message
+              }
+            });
+          }
+        } );
+        }
+        else {
+          requestAnimationFrame(tick);
         }
       }
-      requestAnimationFrame(tick);
+      else {
+        requestAnimationFrame(tick);
+      }
     }
   }
+}
+@Component({
+  selector: 'check-in-dialog',
+  templateUrl: 'check-in-dialog.html',
+})
+export class CheckInDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data) {}
 }
