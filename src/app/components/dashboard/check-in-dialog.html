@@ -2,6 +2,8 @@
 <h2 mat-dialog-title *ngIf="data.user">Check-In {{data.user.firstName }}?</h2>
 <mat-dialog-content class="mat-typography">
   <p *ngIf="data.user">Do you want to check-in {{ data.user.firstName }} {{data.user.lastName}} ({{ data.user.email }})</p>
+    <p><strong *ngIf="isUserMinor(user.dateOfBirth)">Under 18</strong></p>
+    <p><strong *ngIf="user.confirmedAttendance1 == 'false' || !user.confirmedAttendance1">Did not confirm attendance.</strong></p>
   <p *ngIf="data.message">{{ data.message }}</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

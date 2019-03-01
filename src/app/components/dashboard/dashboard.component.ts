@@ -18,6 +18,9 @@ export class DashboardComponent implements OnInit {
   constructor(private route: ActivatedRoute, private service: DashboardService, private dialog: MatDialog,
               private snackBar: MatSnackBar ) { }
   registrants: any;
+  cameraOpen = false;
+  animationFrameInstance: number;
+  userMediaInstance: MediaStreamTrack;
   ngOnInit() {
   }
   onSearchChange(q: string) {
@@ -28,6 +31,18 @@ export class DashboardComponent implements OnInit {
   checkIn(user: any) {
     this.service.checkInUser(user.id).subscribe(data => user.checkedIn = true);
   }
+  isUserMinor(dateOfBirth: string) {
+    return this.service.isUserMinor(dateOfBirth);
+  }
+  stopScanning() {
+    const video: HTMLVideoElement = this.videoPreview.nativeElement;
+    const canvasEl: HTMLCanvasElement = this.scanningCanvas.nativeElement;
+    this.cameraOpen = false;
+    canvasEl.style.visibility = 'hidden';
+    this.userMediaInstance.stop();
+    video.pause();
+    cancelAnimationFrame(this.animationFrameInstance);
+  }
   startScanning() {
     const video: HTMLVideoElement = this.videoPreview.nativeElement;
     const canvasEl: HTMLCanvasElement = this.scanningCanvas.nativeElement;
@@ -35,8 +50,11 @@ export class DashboardComponent implements OnInit {
     const service = this.service;
     const dialog = this.dialog;
     const sb = this.snackBar;
+    const ins = this;
+    this.cameraOpen = true;
     navigator.mediaDevices.getUserMedia({audio: false, video: {facingMode: 'environment'}})
              .then((videoStream) => {
+                this.userMediaInstance = videoStream.getTracks()[0];
                 video.srcObject = videoStream;
                 video.setAttribute('playsinline', 'true');
                 video.play();
@@ -54,60 +72,64 @@ export class DashboardComponent implements OnInit {
       canvas.stroke();
     }
     function tick() {
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvasEl.height = video.videoHeight;
-        canvasEl.width = video.videoWidth;
-        canvasEl.hidden = false;
-        canvas.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
-        const imageData = canvas.getImageData(0, 0, canvasEl.width, canvasEl.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: 'dontInvert',
-        });
-        if (code) {
-          drawLine(code.location.topLeftCorner, code.location.topRightCorner, '#FF3B58');
-          drawLine(code.location.topRightCorner, code.location.bottomRightCorner, '#FF3B58');
-          drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, '#FF3B58');
-          drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, '#FF3B58');
-          let dialogRef;
-          service.getRegistrants(undefined, code.data).subscribe((resp) => {
-          if (resp.checkedIn === true) {
-            sb.open(`${resp.firstName} ${resp.lastName} has already been checked-in`, undefined, {
-              duration: 1500
+      if (ins.cameraOpen === true) {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvasEl.height = video.videoHeight;
+          canvasEl.width = video.videoWidth;
+          canvasEl.style.visibility = 'visible';
+          canvas.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
+          const imageData = canvas.getImageData(0, 0, canvasEl.width, canvasEl.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'dontInvert',
+          });
+          if (code) {
+            drawLine(code.location.topLeftCorner, code.location.topRightCorner, '#FF3B58');
+            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, '#FF3B58');
+            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, '#FF3B58');
+            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, '#FF3B58');
+            let dialogRef;
+            service.getRegistrants(undefined, code.data).subscribe((resp) => {
+            if (resp.checkedIn === true) {
+              sb.open(`${resp.firstName} ${resp.lastName} has already been checked-in`, undefined, {
+                duration: 1500
+              });
+              setTimeout(function () {
+                requestAnimationFrame(tick);
+              }, 1500);
+            }
+            else {
+              dialogRef = dialog.open(CheckInDialogComponent, {
+                data: {
+                  user: resp
+                }
+              });
+            }
+            dialogRef.afterClosed().subscribe(result => {
+              if (result.id) {
+                service.checkInUser(result.id).subscribe(data => console.log(data) );
+              }
+              requestAnimationFrame(tick);
             });
-            requestAnimationFrame(tick);
+          }, error => {
+            console.log(error);
+            if (error.statusCode) {
+              dialogRef = dialog.open(CheckInDialogComponent, {
+                data: {
+                  message: error.message
+                }
+              });
+            }
+          } );
           }
           else {
-            dialogRef = dialog.open(CheckInDialogComponent, {
-              data: {
-                user: resp
-              }
-            });
-          }
-          dialogRef.afterClosed().subscribe(result => {
-            if (result.id) {
-              service.checkInUser(result.id).subscribe(data => console.log(data) );
-            }
             requestAnimationFrame(tick);
-          });
-        }, error => {
-          console.log(error);
-          if (error.statusCode) {
-            dialogRef = dialog.open(CheckInDialogComponent, {
-              data: {
-                message: error.message
-              }
-            });
           }
-        } );
         }
         else {
-          requestAnimationFrame(tick);
+           requestAnimationFrame(tick);
         }
       }
-      else {
-        requestAnimationFrame(tick);
-      }
-    }
+  }
   }
 }
 @Component({
@@ -115,5 +137,8 @@ export class DashboardComponent implements OnInit {
   templateUrl: 'check-in-dialog.html',
 })
 export class CheckInDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data, private service: DashboardService) {}
+  isUserMinor(dateOfBirth: string) {
+    return this.service.isUserMinor(dateOfBirth);
+  }
 }

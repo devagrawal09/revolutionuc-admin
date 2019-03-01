@@ -5,7 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule, MatIconModule, MatTableModule, MatRippleModule, MatBottomSheetModule,
-         MatToolbarModule, MatDialogModule, MatSnackBarModule } from '@angular/material';
+         MatToolbarModule, MatDialogModule, MatSnackBarModule, MatMenuModule } from '@angular/material';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -37,6 +37,7 @@ import { DashboardComponent, CheckInDialogComponent } from './components/dashboa
     MatIconModule,
     MatTableModule,
     MatRippleModule,
+    MatMenuModule,
     MatBottomSheetModule,
     MatToolbarModule,
     MatDialogModule,

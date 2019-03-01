@@ -26,4 +26,15 @@ export class DashboardService {
   checkInUser(uuid: string) {
     return this.http.get(`${this.BASE_URL}/registrants/${uuid}/checkin`);
   }
+  isUserMinor(dateOfBirth: string) {
+    const date = new Date(dateOfBirth);
+    const ageDifMs = new Date('2019-02-02').getTime() - date.getTime();
+    const ageDate = new Date(ageDifMs);
+    const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+    if (age > 17) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

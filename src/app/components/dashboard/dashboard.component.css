@@ -6,3 +6,11 @@ canvas {
     left: 0px;
     top: 7%;
 }
+#closeButton {
+    color: wheat;
+    position: absolute;
+    z-index: 10000;
+    right: 1%;
+    top: 2%;
+    cursor: pointer;
+}

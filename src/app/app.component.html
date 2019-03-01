@@ -1,6 +1,11 @@
 <mat-toolbar color="primary">
   <span>RevUC Admin</span>
+  <span class="fill-remaining-space"></span>
+  <mat-icon style="cursor: pointer; float:right;" [matMenuTriggerFor]="menu">more_vert</mat-icon>
 </mat-toolbar>
+<mat-menu #menu="matMenu">
+  <button *ngIf="isLoggedIn" (click)="logout()" mat-menu-item>Log out</button>
+</mat-menu>
 <div class="container">
   <router-outlet></router-outlet>
 </div>

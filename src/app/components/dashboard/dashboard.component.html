@@ -1,5 +1,7 @@
 <video hidden class="scanning-region" #videoPreview></video>
-<canvas #scanningCanvas hidden></canvas>
+<canvas #scanningCanvas style="visibility: hidden;"></canvas>
+<mat-icon *ngIf="cameraOpen" id="closeButton" (click)="stopScanning()">close</mat-icon>
+
 <button mat-flat-button color="primary" (click)="startScanning()"><mat-icon>photo_camera</mat-icon> Scan QR code</button>
 <mat-card>
   <mat-card-title>Registrants</mat-card-title>
@@ -9,6 +11,8 @@
   <mat-card *ngFor="let user of registrants">
     <h3>{{ user.firstName }} {{user.lastName }}</h3>
     <h5>{{ user.email }}</h5>
+    <p><strong *ngIf="isUserMinor(user.dateOfBirth)">Under 18</strong></p>
+    <p><strong *ngIf="user.confirmedAttendance1 == 'false' || !user.confirmedAttendance1">Did not confirm attendance.</strong></p>
     <mat-card-actions align="end">
       <button *ngIf="user.checkedIn == false" mat-flat-button color="primary" (click)="checkIn(user)">Check-In</button>
       <button *ngIf="user.checkedIn != false" disabled mat-button>Already Checked-In</button>
