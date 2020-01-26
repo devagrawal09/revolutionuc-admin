@@ -28,7 +28,7 @@ export class DashboardService {
   }
   isUserMinor(dateOfBirth: string) {
     const date = new Date(dateOfBirth);
-    const ageDifMs = new Date('2019-02-02').getTime() - date.getTime();
+    const ageDifMs = new Date('2020-02-22').getTime() - date.getTime();
     const ageDate = new Date(ageDifMs);
     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
     if (age > 17) {
