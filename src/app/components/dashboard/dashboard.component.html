@@ -1,5 +1,6 @@
 <mat-card>
   <mat-card-title>Registrants</mat-card-title>
+  <mat-card-subtitle>Checked-in: {{numCheckedIn}}</mat-card-subtitle>
   <mat-form-field style="width:30%">
     <input matInput placeholder="Search for registrant by email or name" (input)="onSearchChange($event.target.value)">
   </mat-form-field>
@@ -7,6 +8,7 @@
     <h3>{{ user.firstName }} {{user.lastName }}</h3>
     <h5>{{ user.email }}</h5>
     <p><strong *ngIf="isUserMinor(user.dateOfBirth)">Under 18</strong></p>
+    <p><strong *ngIf="user.isWaitlisted">Is Waitlisted</strong></p>
     <p><strong *ngIf="user.confirmedAttendance1 == 'false' || !user.confirmedAttendance1">Did not confirm attendance.</strong></p>
     <mat-card-actions align="end">
       <button *ngIf="user.checkedIn == false" mat-flat-button color="primary" (click)="checkIn(user)">Check-In</button>

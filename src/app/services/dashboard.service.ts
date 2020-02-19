@@ -20,8 +20,13 @@ export class DashboardService {
       return this.http.get(`${this.BASE_URL}/registrants`);
     }
   }
-  getStats() {
-    return this.http.get(`${this.BASE_URL}/stats`);
+  getStats(stats) {
+    if (stats){
+      return this.http.get(`${this.BASE_URL}/stats?stats=${stats}`);
+    }
+    else {
+      return this.http.get(`${this.BASE_URL}/stats`);
+    }
   }
   checkInUser(uuid: string) {
     return this.http.get(`${this.BASE_URL}/registrants/${uuid}/checkin`);
