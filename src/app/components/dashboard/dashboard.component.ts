@@ -16,12 +16,12 @@ export class DashboardComponent implements OnInit {
   registrants: any;
   numCheckedIn: number;
   ngOnInit() {
-    this.service.getStats('numCheckedIn').subscribe(data => this.numCheckedIn = data.numCheckedIn);
+    this.service.getStats('numCheckedIn').subscribe(data => this.numCheckedIn = data['numCheckedIn']);
   }
   onSearchChange(q: string) {
     if (q.length >= 3) {
       this.service.getRegistrants(q).subscribe(result => this.registrants = result);
-      this.service.getStats('numCheckedIn').subscribe(data => this.numCheckedIn = data.numCheckedIn);
+      this.service.getStats('numCheckedIn').subscribe(data => this.numCheckedIn = data['numCheckedIn']);
     }
   }
   checkIn(user: any) {
