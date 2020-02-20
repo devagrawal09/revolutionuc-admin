@@ -21,6 +21,9 @@ export class DashboardComponent implements OnInit {
   onSearchChange(q: string) {
     if (q.length >= 3) {
       this.service.getRegistrants(q).subscribe(result => this.registrants = result);
+    }
+    if (q.length == 3) {
+      //I am too lazy to implement a refresh button rn, lets just do it when they type EXACTLY 3 characters...yeah that makes sense.
       this.service.getStats('numCheckedIn').subscribe(data => this.numCheckedIn = data['numCheckedIn']);
     }
   }
