@@ -30,6 +30,9 @@ export class DashboardComponent implements OnInit {
   checkIn(user: any) {
     this.service.checkInUser(user.id).subscribe(data => user.checkedIn = true);
   }
+  checkOut(user: any) {
+    this.service.checkOutUser(user.id).subscribe(data => user.checkedIn = false);
+  }
   isUserMinor(dateOfBirth: string) {
     return this.service.isUserMinor(dateOfBirth);
   }

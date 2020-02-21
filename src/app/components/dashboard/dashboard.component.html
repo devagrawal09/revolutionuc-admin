@@ -13,6 +13,7 @@
     <mat-card-actions align="end">
       <button *ngIf="user.checkedIn == false" mat-flat-button color="primary" (click)="checkIn(user)">Check-In</button>
       <button *ngIf="user.checkedIn != false" disabled mat-button>Already Checked-In</button>
+      <button *ngIf="user.checkedIn != false" mat-flat-button color="warn" (click)="checkOut(user)">Check-Out</button>
     </mat-card-actions>
   </mat-card>
 </mat-card>

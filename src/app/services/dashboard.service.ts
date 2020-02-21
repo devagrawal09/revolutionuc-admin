@@ -31,6 +31,9 @@ export class DashboardService {
   checkInUser(uuid: string) {
     return this.http.get(`${this.BASE_URL}/registrants/${uuid}/checkin`);
   }
+  checkOutUser(uuid: string) {
+    return this.http.get(`${this.BASE_URL}/registrants/${uuid}/checkout`);
+  }
   isUserMinor(dateOfBirth: string) {
     const date = new Date(dateOfBirth);
     const ageDifMs = new Date('2020-02-22').getTime() - date.getTime();
